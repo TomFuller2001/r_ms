@@ -18,17 +18,17 @@ namespace MeduSim1
     class MSmicrocodeStatement
     { // TODO
         public string sJumpLabel;
-        public int memAddress, write, read, alu, jump, jumpAddress;
+        public int memAddress, write, read, alu, jumpCode, jumpAddress;
         
          // Constructor when the memory address is NOT known
-            public MSmicrocodeStatement(string _sJumpLabel, int _write, int _read, int _alu, int _jump, int _jumpAddress)
+            public MSmicrocodeStatement(string _sJumpLabel, int _write, int _read, int _alu, int _jumpCode, int _jumpAddress)
         {
             sJumpLabel = _sJumpLabel;
             memAddress = 0; // This will assigned later by the compiler
             write = _write;
             read = _read;
             alu = _alu;
-            jump = _jump;
+            jumpCode = _jumpCode;
             jumpAddress = _jumpAddress;
         }
 
@@ -40,7 +40,7 @@ namespace MeduSim1
             write = -write;
             read = _read;
             alu = _alu;
-            jump = _jump;
+            jumpCode = _jump;
             jumpAddress = _jumpAddress;
         }
     }

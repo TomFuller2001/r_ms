@@ -51,14 +51,14 @@
             this.tbOut.Multiline = true;
             this.tbOut.Name = "tbOut";
             this.tbOut.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbOut.Size = new System.Drawing.Size(299, 353);
+            this.tbOut.Size = new System.Drawing.Size(856, 390);
             this.tbOut.TabIndex = 1;
             // 
             // Form_MS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(522, 410);
+            this.ClientSize = new System.Drawing.Size(1079, 447);
             this.Controls.Add(this.tbOut);
             this.Controls.Add(this.btnStart);
             this.Name = "Form_MS";

@@ -1,0 +1,9 @@
+C:\Repos\MeduSim\MeduSim1\MeduSim1\bin\Debug\MeduSim1.exe.config
+C:\Repos\MeduSim\MeduSim1\MeduSim1\bin\Debug\MeduSim1.exe
+C:\Repos\MeduSim\MeduSim1\MeduSim1\bin\Debug\MeduSim1.pdb
+C:\Repos\MeduSim\MeduSim1\MeduSim1\obj\Debug\MeduSim1.Form_MS.resources
+C:\Repos\MeduSim\MeduSim1\MeduSim1\obj\Debug\MeduSim1.Properties.Resources.resources
+C:\Repos\MeduSim\MeduSim1\MeduSim1\obj\Debug\MeduSim1.csproj.GenerateResource.Cache
+C:\Repos\MeduSim\MeduSim1\MeduSim1\obj\Debug\MeduSim1.exe
+C:\Repos\MeduSim\MeduSim1\MeduSim1\obj\Debug\MeduSim1.pdb
+C:\Repos\MeduSim\MeduSim1\MeduSim1\obj\Debug\MeduSim1.csprojResolveAssemblyReference.cache

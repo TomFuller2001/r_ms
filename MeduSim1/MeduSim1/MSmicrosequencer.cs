@@ -22,13 +22,16 @@ namespace MeduSim1
     /// </summary>
     class MSmicrosequencer
     {
-        public enum RegisterSet { PipelineWrite = 0, PipelineRead = 1, PipelineALU = 3, PipelineJump = 4, MUX, MRTN, MPC};
-        private const int cFF = 0xFF; // default contents for registers at startup (=255)
-        // This list is used by toString
+        public enum RegisterSet { PipelineWrite = 0, PipelineRead = 1, PipelineALU = 2, PipelineJump = 3, MUX = 4, MRTN = 5, MPC = 6};
+        private const int iRegCount = 7; // count of registers
+        // This list is used by ToString
         private RegisterSet[] aRegisters = { RegisterSet.PipelineWrite, RegisterSet.PipelineRead, RegisterSet.PipelineALU, RegisterSet.PipelineJump,
             RegisterSet.MUX, RegisterSet.MRTN, RegisterSet.MPC };
 
-        private Dictionary<RegisterSet, int> MicroRegisterContent;
+        // These are the actual contents of the registers.
+        private byte[] MicroRegisterContent; 
+
+        // References to other useful objects TODO: These may no longer be needed
         private MSstate state;
         private MScontrolTable ControlTable;
         private MS_ALU alu;
@@ -67,118 +70,50 @@ namespace MeduSim1
                 {
                     // create the single object instance
                     c_microSeq = new MSmicrosequencer();
-
-                    c_microSeq.MicroRegisterContent = new Dictionary<RegisterSet, int>();
                     c_microSeq.LoadInitStates();
-                    c_microSeq.state = MSstate.Get_MSstate();
-                    c_microSeq.alu  = MS_ALU.Get_MS_ALU();
                 } // if null
 
                 // whether new or old, return a reference to the only instance
                 return c_microSeq;
             } // lock
         }
+
         private void LoadInitStates()
         {
-            foreach (RegisterSet rs in aRegisters)
-                MicroRegisterContent[rs] = 0;
+            // allocate memory; it is automatically set to zeros
+            MicroRegisterContent = new byte[iRegCount];
 
+            state = MSstate.Get_MSstate();
+            alu = MS_ALU.Get_MS_ALU();
             ControlTable = new MScontrolTable();
         }
 
         public override string ToString()
         {
-            String ret = "";
+            string ret = "";
             // Print register contents; ToString("X") prints the integer address as hexadecimal
             foreach (RegisterSet rs in aRegisters)
-                ret += string.Format("{0}:{1}  ", rs.ToString(), MicroRegisterContent[rs].ToString("X"));
+                ret += string.Format("{0}:{1,2:X2}  ", rs.ToString(), MicroRegisterContent[(int) rs].ToString());
             ret += System.Environment.NewLine;
 
             return ret;
         }
 
-        public bool PerformOneMicroStatement(MSmicrocodeStatement mc)
-        {
-            // handle the easy cases first
-            if (ControlTable.aCTread[mc.write] == MSstate.RegSet.incPC_MAR)
+        /// <summary>
+        /// This method determines the next address, based on the current microinstruction,
+        ///    status word, MRTN register, etc. 
+        /// </summary>
+        public bool GetJump(MSmicrocodeStatement mc)
+        { // TODO This hard code neglects the MScontrolTable!
+            if (mc.jumpCode == 0)
             {
-                PerformIncMAR(); PerformIncPC(); return true;
+                // No jump; increment MPC and set to MUX register
+                MicroRegisterContent[(int)RegisterSet.MUX] = ++MicroRegisterContent[(int)RegisterSet.MPC];
+                return true;
             }
 
-            if (ControlTable.aCTread[mc.read] == MSstate.RegSet.incPC)
-            {
-                PerformIncPC(); return true;
-            }
-
-            if (ControlTable.aCTread[mc.read] == MSstate.RegSet.incMAR)
-            {
-                PerformIncMAR(); return true;
-            }
-
-            // determine the source and destination of this instruction
-            //    (Though they may not always be applicable)
-            MSstate.RegSet RWdestination, RWsource;
-
-            if (mc.write == 13 || mc.write == 15 || (mc.write > 0 && mc.write < 12))
-                RWdestination = ControlTable.aCTwrite[mc.write];
-            else return false; // TODO throw exception
-
-            if (mc.read == 13 || mc.read == 15 || (mc.read > 0 && mc.read < 10))
-                    RWsource = ControlTable.aCTwrite[mc.read];
-                else return false; // TODO throw exception
-
-            // Handle the most frequent case (assignment), ALU "does" B
-            if (ControlTable.aFn[mc.alu] == MScontrolTable.ALU_fn.B)
-            {
-                PerformAssign(RWdestination, RWsource); return true;
-            }
-
-            // More complicated ALU functions are remanded to the ALU object
-            //    but return here to handle the possible micro jump.
-            alu.PerformOneMicroStatement(mc.alu, RWdestination, RWsource);
-
-            // Determine the next micro code address
+            // TODO: rest of jump codes
             return false;
-        }
-
-        private void PerformAssign(MSstate.RegSet destination, MSstate.RegSet source)
-        {
-            // perform the assignment
-            state.RegisterContent[destination] = state.RegisterContent[source];
-        }
-
-        /// <summary>
-        /// This is a bit subtle. The actual hardware increment for PC or MAR increments the
-        ///    entire register. That is, if PClo is 255, it becomes 0 and PChi is incremented by one.
-        ///    This method emulates that action. 
-        /// </summary>
-        /// <returns>Returns true.</returns>
-        private bool PerformIncPC()
-        {
-            if (state.RegisterContent[MSstate.RegSet.PClo] == 255)
-            {
-                state.RegisterContent[MSstate.RegSet.PClo] = 0;
-                state.RegisterContent[MSstate.RegSet.PChi] += 1;
-            }
-            else
-                state.RegisterContent[MSstate.RegSet.PClo] += 1;
-            return true;
-        }
-
-        /// <summary>
-        /// This is a bit subtle. The actual hardware increment for PC or MAR increments the
-        ///    entire register. That is, if MARlo is 255, it becomes 0 and MARhi is incremented by one.
-        ///    This method emulates that action. 
-        /// </summary>
-        /// <returns>Returns true.</returns>
-        private bool PerformIncMAR()
-        {
-            if (state.RegisterContent[MSstate.RegSet.MARlo] == 255) {
-                state.RegisterContent[MSstate.RegSet.MARlo] = 0;
-                state.RegisterContent[MSstate.RegSet.MARhi] += 1;
-            } else
-                state.RegisterContent[MSstate.RegSet.MARlo] += 1;
-            return true;
         }
 
     }

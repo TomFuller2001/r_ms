@@ -16,12 +16,12 @@ namespace MeduSim1
     {
         // This enumerated type include registers themselves and several special items used in MScontrolTable (like nop and incPC).
         public enum RegSet {MARlo, MARhi, UART, AClo, AChi, BRlo, BRhi, PClo, PChi, SPlo, SPhi, ALUin, nop, MEM, incPC, incMAR, incPC_MAR };
-        private const int cFF=0xFF; // default contents for registers at startup (=255)
+        private const byte cFF = unchecked ( (byte) 0xFF); // default contents for registers at startup, FF
         // This list is used by ToString() below
         private RegSet[] aRegisters = { RegSet.UART, RegSet.AClo, RegSet.AChi, RegSet.BRlo,
             RegSet.BRhi, RegSet.PClo, RegSet.PChi, RegSet.SPlo, RegSet.SPhi, RegSet.ALUin };
 
-        public Dictionary<RegSet, int> RegisterContent;
+        public Dictionary<RegSet, byte> RegisterContent;
 
         /// <summary>
         /// The single object instance for this class. The C# compiler
@@ -59,7 +59,7 @@ namespace MeduSim1
                     // create the single object instance
                     c_state = new MSstate();
 
-                    c_state.RegisterContent = new Dictionary<RegSet, int>();
+                    c_state.RegisterContent = new Dictionary<RegSet, byte>();
                     c_state.LoadInitStates();
                 } // if null
 
@@ -77,23 +77,26 @@ namespace MeduSim1
             RegisterContent[RegSet.PClo]  =
             RegisterContent[RegSet.PChi]  =
             RegisterContent[RegSet.MARlo] =
-            RegisterContent[RegSet.MARhi] = 0;
+            RegisterContent[RegSet.MARhi] = (byte)0;
         }
 
         public override string ToString ()
         {
-            String ret = "";
-            // ToString("X") prints the integer address as hexadecimal; this should also print the *contents* at the current MAR address TODO
-            ret += string.Format("MAR:  {0} {1}", RegisterContent[RegSet.MARhi].ToString("X"), RegisterContent[RegSet.MARlo].ToString("X"));
+            string ret = "";
+            // ToString("X") alternatively prints the integer address as hexadecimal; this should also print the *contents* at the current MAR address TODO
+            ret += string.Format("MAR:  {0,2} {1,2:}", RegisterContent[RegSet.MARhi].ToString("X"), RegisterContent[RegSet.MARlo].ToString("X"));
             ret += System.Environment.NewLine;
 
             // Print the remaining register contents
             foreach (RegSet rs in aRegisters)
-                ret += string.Format("{0}:{1}  ", rs.ToString(), RegisterContent[rs].ToString("X"));
+                ret += string.Format("{0}:{1,2}  ", rs.ToString(), RegisterContent[rs].ToString("X"));
 
             // Add the state of the microsequencer
             ret += System.Environment.NewLine;
             ret += MSmicrosequencer.Get_MSmicrosequencer().ToString();
+
+            // Add the status word from the ALU
+            ret += MS_ALU.Get_MS_ALU().ToString();
             ret += System.Environment.NewLine;
 
             return ret;

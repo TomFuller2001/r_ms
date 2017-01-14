@@ -35,9 +35,9 @@ Write SPHi  9	9	Read SPHi   A + B + 1	9	9	not used    XX
 Write MARLo A   A   inc PC A - 1	A A   not used    XX
 Write MARHi B   B   inc MAR A - B B   B not used XX
 not used    C   C   not used    A - B - 1	C C   not used    XX
-Write ALUi D   D    ALUi read   1	D D   not used    XX /// TODO impossible to read ALUin directly
-inc MAR&PC E   E    not used    0	E E   not used    XX /// TODO better not choose two inc in one instruction!
-UART Xmit   F F     UART RcvDat	-1	F F   HM OPCODEin XX
+Write ALUi  D   D   ALUi read   1	D D   not used    XX /// TODO impossible to read ALUin directly
+inc MAR&PC  E   E   not used    0	E E   not used    XX /// TODO better not choose two inc in one instruction!
+UART Xmit   F   F   UART RcvDat	-1	F F   HM OPCODEin XX
 #endif
         // We hard-code the control table while testing. TODO read in from xml file
         public MSstate.RegSet[] aCTwrite = { MSstate.RegSet.nop, MSstate.RegSet.MEM, MSstate.RegSet.AClo, MSstate.RegSet.AChi, MSstate.RegSet.BRlo, MSstate.RegSet.BRhi, MSstate.RegSet.PClo, MSstate.RegSet.PChi,
